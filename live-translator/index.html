@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مترجم فدفدة الفوري — Live Caption Translator</title>
+  <meta name="description" content="ترجمة صوتية فورية من الإنجليزية إلى العربية مع كابشن احترافي على الشاشة" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- ===== Header ===== -->
+  <header class="app-header">
+    <div class="brand">
+      <span class="logo">🎙️</span>
+      <div>
+        <h1>مترجم فدفدة الفوري</h1>
+        <p class="subtitle">Live Caption Translator — English → العربية</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button id="themeBtn" class="icon-btn" title="تبديل المظهر">🌓</button>
+      <button id="settingsBtn" class="icon-btn" title="الإعدادات">⚙️</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- ===== Control Panel ===== -->
+    <section class="panel controls" id="controlPanel">
+      <h2 class="panel-title">لوحة التحكم</h2>
+
+      <!-- Source -->
+      <div class="field">
+        <label>مصدر الصوت</label>
+        <div class="segmented" id="sourceSeg">
+          <button class="seg-btn active" data-source="mic">🎤 المايكروفون</button>
+          <button class="seg-btn" data-source="tab">🖥️ صوت التبويب/النظام</button>
+        </div>
+        <p class="hint" id="sourceHint">المايك يعمل مجاناً بالكامل عبر متصفحك.</p>
+      </div>
+
+      <!-- Engine -->
+      <div class="field">
+        <label>محرك الترجمة</label>
+        <select id="engineSelect">
+          <option value="auto">تلقائي (مجاني، ويستخدم API إن توفر)</option>
+          <option value="free">مجاني فقط (Google / MyMemory)</option>
+          <option value="openai">احترافي (OpenAI — يتطلب مفتاح)</option>
+        </select>
+      </div>
+
+      <!-- Languages -->
+      <div class="field grid-2">
+        <div>
+          <label>من</label>
+          <select id="srcLang">
+            <option value="en-US" selected>English (US)</option>
+            <option value="en-GB">English (UK)</option>
+            <option value="fr-FR">Français</option>
+            <option value="es-ES">Español</option>
+            <option value="de-DE">Deutsch</option>
+            <option value="tr-TR">Türkçe</option>
+          </select>
+        </div>
+        <div>
+          <label>إلى</label>
+          <select id="dstLang">
+            <option value="ar" selected>العربية</option>
+            <option value="en">English</option>
+            <option value="fr">Français</option>
+            <option value="es">Español</option>
+            <option value="tr">Türkçe</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Start / Stop -->
+      <div class="field">
+        <button id="startBtn" class="btn-primary">▶️ ابدأ الترجمة الفورية</button>
+        <button id="stopBtn" class="btn-danger" hidden>⏹️ إيقاف</button>
+      </div>
+
+      <div id="status" class="status idle">جاهز.</div>
+
+      <!-- Display options -->
+      <details class="display-options" open>
+        <summary>خيارات العرض</summary>
+
+        <div class="field">
+          <label>حجم الخط <span id="fontSizeVal">42</span>px</label>
+          <input type="range" id="fontSize" min="20" max="110" value="42" />
+        </div>
+
+        <div class="field grid-2">
+          <div>
+            <label>لون النص</label>
+            <input type="color" id="textColor" value="#ffffff" />
+          </div>
+          <div>
+            <label>لون الخلفية</label>
+            <input type="color" id="bgColor" value="#000000" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>شفافية الخلفية <span id="opacityVal">70</span>%</label>
+          <input type="range" id="bgOpacity" min="0" max="100" value="70" />
+        </div>
+
+        <div class="field grid-2">
+          <label class="check"><input type="checkbox" id="showOriginal" /> إظهار النص الأصلي</label>
+          <label class="check"><input type="checkbox" id="autoScroll" checked /> تمرير تلقائي</label>
+        </div>
+
+        <div class="field">
+          <label>موضع الكابشن</label>
+          <select id="captionPos">
+            <option value="bottom" selected>أسفل الشاشة</option>
+            <option value="center">المنتصف</option>
+            <option value="top">أعلى الشاشة</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <button id="fullscreenBtn" class="btn-ghost">⛶ وضع العرض ملء الشاشة</button>
+        </div>
+      </details>
+
+      <!-- Export -->
+      <details class="display-options">
+        <summary>السجل والتصدير</summary>
+        <div class="field grid-2">
+          <button id="exportTxt" class="btn-ghost">⬇️ تصدير نص (.txt)</button>
+          <button id="exportSrt" class="btn-ghost">⬇️ تصدير ترجمة (.srt)</button>
+        </div>
+        <div class="field">
+          <button id="clearBtn" class="btn-ghost">🗑️ مسح السجل</button>
+        </div>
+      </details>
+    </section>
+
+    <!-- ===== Caption Display ===== -->
+    <section class="panel display" id="displayPanel">
+      <div class="display-toolbar">
+        <span class="rec-dot" id="recDot"></span>
+        <span id="displayLabel">شاشة الكابشن</span>
+        <span class="spacer"></span>
+        <button id="extraToggle" class="icon-btn" title="لوحة إضافية">➕</button>
+      </div>
+
+      <div class="caption-stage" id="captionStage">
+        <div class="caption-box" id="captionBox" data-pos="bottom">
+          <p class="caption-empty" id="captionEmpty">سيظهر النص المترجم هنا فور بدء التحدث…</p>
+          <div id="captionLines"></div>
+          <p class="caption-interim" id="captionInterim"></p>
+        </div>
+      </div>
+
+      <!-- Extra customizable panel (extension-like widgets) -->
+      <aside class="extra-panel" id="extraPanel" hidden>
+        <h3>لوحة إضافية</h3>
+        <p class="hint">مساحة قابلة للتخصيص لعرض عناصر أخرى بجانب الترجمة.</p>
+        <div class="widgets">
+          <div class="widget">
+            <span class="widget-label">⏱️ الوقت المنقضي</span>
+            <span class="widget-val" id="elapsed">00:00</span>
+          </div>
+          <div class="widget">
+            <span class="widget-label">📝 عدد الكلمات</span>
+            <span class="widget-val" id="wordCount">0</span>
+          </div>
+          <div class="widget">
+            <span class="widget-label">🌐 المحرك المستخدم</span>
+            <span class="widget-val" id="engineUsed">—</span>
+          </div>
+        </div>
+        <textarea id="notesArea" placeholder="ملاحظاتك هنا…"></textarea>
+      </aside>
+    </section>
+  </main>
+
+  <!-- ===== Settings Modal ===== -->
+  <div class="modal-overlay" id="settingsModal" hidden>
+    <div class="modal">
+      <div class="modal-head">
+        <h2>الإعدادات</h2>
+        <button id="closeSettings" class="icon-btn">✖️</button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label>مفتاح OpenAI API (اختياري — للترجمة الاحترافية وصوت التبويب)</label>
+          <input type="password" id="apiKey" placeholder="sk-..." />
+          <p class="hint">يُحفظ محلياً في متصفحك فقط (localStorage) ولا يُرسل لأي خادم سوى OpenAI مباشرة.</p>
+        </div>
+        <div class="field">
+          <label>طراز الترجمة (OpenAI)</label>
+          <input type="text" id="apiModel" value="gpt-4o-mini" />
+        </div>
+        <div class="field">
+          <label class="check"><input type="checkbox" id="professionalTone" checked /> ترجمة بأسلوب احترافي/فصيح</label>
+        </div>
+        <div class="field">
+          <button id="saveSettings" class="btn-primary">💾 حفظ</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    <span>أداة فدفدة للترجمة الفورية</span>
+    <a href="README.md" target="_blank">دليل الاستخدام</a>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

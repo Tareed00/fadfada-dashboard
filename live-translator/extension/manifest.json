@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "مترجم فدفدة الفوري — Live Caption Translator",
+  "version": "1.0.0",
+  "description": "ترجمة صوتية فورية من الإنجليزية إلى العربية مع كابشن احترافي على الشاشة.",
+  "permissions": ["storage", "tabCapture", "sidePanel"],
+  "action": {
+    "default_title": "مترجم فدفدة الفوري",
+    "default_icon": {
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "128": "icons/icon128.png"
+  },
+  "side_panel": {
+    "default_path": "index.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}
