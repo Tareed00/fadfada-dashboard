@@ -1,1 +1,4 @@
 *.zip
+lottie-player/node_modules/
+lottie-player/dist/
+lottie-player/public/canvaskit.wasm
